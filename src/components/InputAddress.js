@@ -27,4 +27,6 @@ export default function InputAddress({ $app, initialState }) {
       </div>
     `;
   };
+
+  this.render();
 }

@@ -20,4 +20,6 @@ export default function InputDate({ $app, initialState }) {
       </div>
     `;
   };
+
+  this.render()
 }
