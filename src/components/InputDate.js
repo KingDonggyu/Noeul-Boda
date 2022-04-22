@@ -1,9 +1,9 @@
 export default function InputDate({ $app, initialState }) {
   this.state = initialState;
 
-  this.$target = document.createElement('div');
-  this.$target.className = 'input-date';
-  $app.appendChild(this.$target);
+  const $target = document.createElement('div');
+  $target.className = 'input-date';
+  $app.appendChild($target);
 
   this.setState = (nextState) => {
     this.state = nextState;
@@ -11,7 +11,7 @@ export default function InputDate({ $app, initialState }) {
   };
 
   this.render = () => {
-    this.$target.innerHTML = `
+    $target.innerHTML = `
       <h3>날짜</h3>
       <div id="date-picker">
         <button>오늘</button>
@@ -19,6 +19,12 @@ export default function InputDate({ $app, initialState }) {
         <button>모레</button>
       </div>
     `;
+
+    $target.style.cssText = `
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    `
   };
 
   this.render()

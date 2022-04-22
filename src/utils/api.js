@@ -17,6 +17,7 @@ export const requestWeather = async () => {
   }
 };
 
+// '기상청_단기예보_위경도' xlsx 파일을 통한 국내 지역별 좌표 정보 반환
 export const requestGeocoding = async () => {
   try {
     const res = await fetch('../../geographic_coordinates.xlsx');
@@ -25,7 +26,7 @@ export const requestGeocoding = async () => {
     }
     const buffer = await res.arrayBuffer()
     const workbook = read(buffer, {type: 'array'});
-    
+
     return parseXLSX(workbook);
   } catch (e) {
     throw new Error(`xlsx file 요청 실패 ${e.message}`);
