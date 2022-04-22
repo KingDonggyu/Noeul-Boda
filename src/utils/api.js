@@ -1,3 +1,4 @@
+import { read, utils } from "https://cdn.sheetjs.com/xlsx-latest/package/xlsx.mjs";
 import WEATHER_API_KEY from '../../apikey.js';
 
 // OpenWeatherMap API를 통한 날씨 정보 반환
@@ -8,58 +9,32 @@ export const requestWeather = async () => {
   try {
     const res = await fetch(`${API_END_POINT}&appid=${WEATHER_API_KEY}`);
     if (!res.ok) {
-      throw new Error('api 요청 실패');
+      throw new Error('weather api 요청 실패');
     }
     return await res.json();
   } catch (e) {
-    throw new Error(`api 요청 실패 ${e.message}`);
+    throw new Error(e.message);
   }
 };
 
-// 기상청 위경도 xlsx 파일을 통한 경도/위도 정보 반환
 export const requestGeocoding = async () => {
-  let result = await loadXLSX();
-  return result;
-};
+  try {
+    const res = await fetch('../../geographic_coordinates.xlsx');
+    if (!res.ok) {
+      throw new Error('error');
+    }
+    const buffer = await res.arrayBuffer()
+    const workbook = read(buffer, {type: 'array'});
+    
+    return parseXLSX(workbook);
+  } catch (e) {
+    throw new Error(`xlsx file 요청 실패 ${e.message}`);
+  }
+}
 
-const loadXLSX = async () => {
-  return new Promise((resolve, reject) => {
-    const xhr = new XMLHttpRequest();
-
-    xhr.responseType = 'blob';
-    xhr.open('GET', '/geographic_coordinates.xlsx', true);
-
-    xhr.onload = function () {
-      const file = this.response;
-      const reader = new FileReader();
-
-      if (reader.readAsBinaryString) {
-        reader.onload = (e) => {
-          resolve(parseXLSX(e.target.result));
-        };
-        reader.readAsBinaryString(file);
-      } else { // for IE browser
-        reader.onload = (e) => {
-          const data = '';
-          const bytes = new Uint8Array(e.target.result);
-          
-          for (let i = 0; i < bytes.byteLength; i++) {
-            data += String.fromCharCode(bytes[i]);
-          }
-          resolve(parseXLSX(data));
-        };
-        reader.readAsArrayBuffer(file);
-      }
-    };
-
-    xhr.send();
-  });
-};
-
-const parseXLSX = (data) => {
-  const workbook = XLSX.read(data, { type: 'binary' });
+const parseXLSX = (workbook) => {
   const sheet = workbook.Sheets[workbook.SheetNames[0]];
-  const rows = XLSX.utils.sheet_to_row_object_array(sheet);
+  const rows = utils.sheet_to_row_object_array(sheet);
 
   const geocoding = new Object();
 
